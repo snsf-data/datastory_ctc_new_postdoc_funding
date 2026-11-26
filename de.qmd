@@ -1,0 +1,249 @@
+---
+title: "`r params$title`"
+format:
+  html:
+    toc: false
+    css: ["style.css"]
+    mainfont: Theinhardt
+    fontsize: "16px"
+    embed-resources: true
+    page-layout: custom
+    link-external-newwindow: true
+    footnotes-hover: true
+    fig-align: center
+    fig-format: retina
+    fig-dpi: 300
+language:
+  section-title-footnotes: "Fussnoten"
+params:
+  title: "Von Evidenz zur Reform: das neue Postdoc-Förderinstrument des SNF"
+  lead: "Erkenntnisse aus der Studie «Career Tracker Cohorts» haben die Ausgestaltung des neuen Förderinstruments Postdoc-Beitrag mitgeprägt. Es bietet Forschenden in frühen Karrierephasen bessere Rahmenbedingungen und mehr Flexibilität."
+  publication_date: "2026-11-26 04:00:00"
+  lang: de
+  doi_url: "https://doi.org/10.46446/datastory.ctc-new-postdoc-funding"
+  github_url: "https://github.com/snsf-data/datastory_ctc_new_postdoc_funding"
+execute:
+  echo: false
+  warning: false
+  message: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r general-setup}
+#| include: false
+
+chk_ds_pkg_is_installed <- function() {
+  if (!require("snf.datastory", quietly = TRUE)) {
+    stop(
+      "The `snf.datastory` package is not available. Run ",
+      "`devtools::install_github(\"snsf-data/snf.datastory\")` to install the ",
+      "latest version."
+    )
+  }
+  ds_ver <- packageDescription("snf.datastory")[["Version"]]
+  if (package_version(ds_ver) < package_version("0.1.5")) {
+    stop(
+      "`snf.datastory` >= 0.1.5 is required and your version is ",
+      ds_ver,
+      ". Run `devtools::install_github(\"snsf-data/snf.datastory\")` to ",
+      "install the latest version."
+    )
+  }
+}
+
+chk_ds_pkg_is_installed()
+
+# Load packages
+library(here)
+library(readr)
+library(ggchicklet)
+library(ggplot2)
+library(ggtext)
+library(grid)
+library(knitr)
+library(snf.datastory)
+library(dplyr)
+library(purrr)
+
+source("R/read_and_prepare_data.R")
+source("R/make_figures.R")
+source("R/translations.R")
+
+# Set the locale for date formatting (Windows)
+Sys.setlocale(
+  "LC_TIME",
+  switch(
+    params$lang,
+    en = "English",
+    de = "German",
+    fr = "French"
+  )
+)
+
+# Knitr hook for local formatting of printed numbers
+knitr::knit_hooks$set(
+  inline = function(x) {
+    if (!is.numeric(x)) {
+      x
+    } else {
+      snf.datastory::print_num(x, params$lang)
+    }
+  }
+)
+
+```
+
+```{r print-header-infos}
+#| results: asis
+
+# Add publication date to header
+cat(format(as.Date(params$publication_date), "%d.%m.%Y"))
+```
+
+**`r params$lead`**
+
+Internationaler Austausch und internationale Netzwerke sind seit Langem ein wichtiger Bestandteil der akademischen Forschung. Verschiedene Mechanismen fördern den Austausch zwischen Institutionen, Ländern und Sektoren. Diese entwickeln sich aufgrund neuer Kommunikationsmöglichkeiten ständig weiter. Gleichzeitig verändern sich im Lauf einer Karriere auch die beruflichen Ziele und persönlichen Lebensumstände der Forschenden.
+
+Zusammen mit unsicheren Karriereperspektiven beeinflussen diese Faktoren die Möglichkeiten von Forschenden für internationale Zusammenarbeit einschliesslich Forschungsaufenthalte im Ausland. Vor diesem Hintergrund muss die Förderung von Postdoktorierenden internationale Zusammenarbeit ermöglichen, die zu exzellenter Forschung beiträgt. Gleichzeitig muss sie die wissenschaftliche Eigenständigkeit der Forschenden fördern und unterschiedliche Karrierewege und persönliche Lebenssituationen berücksichtigen.
+
+Der SNF reformiert seine Karriereförderung, um seine Förderinstrumente besser auf die Karrierephasen der Forschenden abzustimmen, eine grössere Vielfalt an Karrierewegen abzubilden und vorteilhafte Rahmenbedingungen für die Forschung zu schaffen. [Ein zentraler Bestandteil der Reform ist die Einführung des neuen Postdoc-Beitrags im Jahr 2028](https://www.snf.ch/de/iZvbYDyIyY1mGyA0/news/neues-zur-reform-der-karriereinstrumente), der die Karriereinstrumente Postdoc.Mobility und Ambizione ablöst.
+
+Das Vorgehen bei dieser Reform ist exemplarisch für das übergeordnete Bestreben des SNF, seine Förderpolitik evidenzbasiert weiterzuentwickeln. Neben Evaluationen, Konsultationen und administrativen Daten war in diesem Projekt die Studie «Career Tracker Cohorts (CTCs)» eine wichtige Evidenzbasis. Sie begleitet Forschende nach ihrer Bewerbung um Karriereförderung des SNF über längere Zeit und zeigt auf, wie sich ihre Laufbahnen entwickeln. So macht sie Muster sichtbar, die sich aus den Gesuchsdaten allein nicht ableiten lassen. Die daraus gewonnenen Erkenntnisse zeigten Probleme im bestehenden System auf und flossen in die Entwicklung des neuen Postdoc-Beitrags ein. Darüber hinaus ermöglichte die Studie dem SNF, die Erfahrungen und Präferenzen der Forschenden bei der Entwicklung des neuen Fördermodells zu berücksichtigen.
+
+::: info-box
+
+### Die Studie «Career Tracker Cohorts»
+
+Die Studie [«Career Tracker Cohorts (CTCs)»](https://careertrackercohorts.ch/) ist eine vom SNF initiierte Längsschnittstudie. Sie begleitet Gesuchstellende in der Karriereförderung des SNF und untersucht, wie sich ihre beruflichen Laufbahnen entwickeln. Wiederholte Befragungen über einen Zeitraum von mindestens zehn Jahren erfassen Veränderungen bei Beschäftigung, Forschungstätigkeit, Karrierezielen und beruflichen Erfahrungen. So liefert die Studie Erkenntnisse darüber, welchen Beitrag die Karriereförderung zur beruflichen Entwicklung von Forschenden leistet. 
+
+An der Studie nehmen rund 3700 Personen teil, die sich zwischen Herbst 2018 und Frühjahr 2021 für Early Postdoc.Mobility, Postdoc.Mobility, Ambizione, PRIMA oder Eccellenza beworben haben. Begleitet werden sowohl Gesuchstellende, die eine Förderung erhalten haben, als auch Gesuchstellende, deren Gesuche abgelehnt wurden. Die Studie wird im Auftrag des SNF vom Interfaculty Centre for Educational Research der Universität Bern durchgeführt. Die Daten stehen auch für Forschungszwecke ausserhalb der eigenen Analysen des SNF zur Verfügung. Der Zugang kann über  beantragt werden.
+
+:::
+
+### Stärken ausbauen, Schwächen angehen
+
+Postdoc.Mobility und Ambizione haben Forschenden in frühen Karrierephasen in der Schweiz wertvolle und sich ergänzende Unterstützung geboten. Postdoc.Mobility ermöglicht internationale Forschungserfahrung mit der Aussicht, anschliessend eine Rückkehr in die Schweiz finanziell fördern zu lassen. Ambizione wiederum erlaubt es Forschenden, eigene Forschungsprojekte an Schweizer Institutionen zu leiten. Frühere Ergebnisse der CTC-Studie zeigen, dass Beitragsempfangende in der Karriereförderung einen grösseren Anteil ihrer Arbeitszeit für Forschung aufwendeten als Forschende in anderen Forschungspositionen. Wer einen Beitrag abgeschlossen hatte, [bewertete diesen in der Regel als hilfreich für die weitere akademische Laufbahn](https://careertrackercohorts.ch/wp-content/uploads/2025/07/2025-2-SNSF-CTC-Newsletter.pdf).
+
+Die Studie zeigte jedoch auch erhebliche Schwächen auf. Dazu gehören ein unzureichendes Mentoring, [Schwierigkeiten beim Wiederanschluss an das Schweizer Forschungssystem nach einem Auslandsaufenthalt](https://data.snf.ch/stories/ctc-18-postdoc-karrieren-de) sowie das [Fehlen einer regulären Anstellung bei vielen Beitragsempfangenden von Postdoc.Mobility](https://careertrackercohorts.ch/wp-content/uploads/2024/03/2023-1-SNSF-CTC-Newsletter.pdf), insbesondere mit Blick auf Lücken bei den Sozialabgaben. Einige dieser Erkenntnisse führten rasch zu gezielten Verbesserungen, etwa zu strengeren Anforderungen an das Mentoring und zu einer höheren Finanzierung für Rückkehrbeiträge an eine Institution in der Schweiz. Grundlegendere strukturelle Fragen blieben jedoch bestehen, insbesondere die Frage, wie wissenschaftliche Eigenständigkeit, internationale Erfahrung und sichere Arbeitsbedingungen in der Förderung von Postdoktorierenden miteinander verbunden werden können. 
+
+### Was ist Forschenden bei der Förderung in der Postdoc-Phase wichtig?
+
+Im Rahmen der aktuellen Reform der Karriereförderung wollte der SNF herausfinden, welche Merkmale eines Postdoc-Förderinstruments Forschenden, die diese Karrierephase bereits durchlaufen haben, besonders wichtig sind. Dazu integrierte der SNF ein eigens entwickeltes faktorielles Umfrageexperiment, auch faktorieller Survey genannt, in die CTC-Monitoring-Umfrage 2025. Die Teilnehmenden beurteilten darin mehrere hypothetische Postdoc-Förderinstrumente, die sich hinsichtlich Dauer und Standort unterschieden. 
+
+::: info-box
+
+### Wie wir die Präferenzen von Forschenden mit einem faktoriellen Survey untersuchten
+
+Bei einem faktoriellen Survey werden den Teilnehmenden hypothetische Optionen vorgelegt, die sich nur in ausgewählten Merkmalen unterscheiden. Durch die systematische Kombination dieser Merkmale und die Aufforderung, zwischen verschiedenen Optionen zu wählen, lässt sich analysieren, welche Merkmalkombinationen bevorzugt werden.
+
+In dieser Studie unterschieden sich die hypothetischen Postdoc-Förderinstrumente hinsichtlich ihrer Dauer (24, 36 oder 48 Monate) und ihres Standorts (vollständig in der Schweiz, vollständig im Ausland oder ein gemischtes Modell mit Basis in der Schweiz und einem optionalen Auslandsaufenthalt). Aus der Kombination dieser Merkmale ergaben sich neun mögliche Förderinstrumente. Alle übrigen Aspekte, darunter Zielgruppe, gedeckte Kosten und Anstellungsstatus, blieben unverändert. Jede teilnehmende Person bewertete drei zufällig randomisierte Paare von Förderinstrumenten und wählte jeweils dasjenige aus, für das sie sich bevorzugt bewerben würde.
+
+::: plot-box
+<div class="plot-title">Beispiel für eines der den Teilnehmenden vorgelegten Paare</div>
+```{r plot-desktop-1}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_1()
+
+```
+::: caption
+Die Befragung wurde ausschliesslich auf Englisch durchgeführt. Der Screenshot ist daher in der Originalsprache abgebildet.
+:::
+:::
+
+Die abschliessende Analyse umfasst 1077 Entscheidungen von 368 Forschenden. Drei Viertel von ihnen hatten zuvor einen Beitrag aus der Karriereförderung erhalten oder erhielten zum Zeitpunkt der Befragung einen solchen. Dabei handelte es sich mehrheitlich um Stipendien von (Early) Postdoc.Mobility. Die Stichprobe umfasst Forschende aus allen drei Forschungsbereichen und weist insgesamt eine ausgeglichene Geschlechterverteilung auf: 37,7% haben einen Hintergrund in den LW oder arbeiten derzeit in diesem Bereich, 33,6% in MINT und 27,9% in den GSW; 44,9% sind Frauen. 
+
+:::
+
+### Forschende bevorzugen klar längere Beitragsdauern und mehr Flexibilität
+
+Die Ergebnisse des faktoriellen Surveys zeigen zwei klare Muster. Erstens bevorzugten die Forschenden durchgehend Optionen mit längeren Beitragsdauern. Bei Förderinstrumenten mit Basis in der Schweiz oder einer Kombination aus Aufenthalten in der Schweiz und im Ausland steigt die Beliebtheit mit zunehmender Beitragsdauer deutlich an: von 22% auf 50% beziehungsweise von 40% auf 78%. Bei Förderinstrumenten, die vollständig im Ausland angesiedelt sind, wurden die drei- und vierjährigen Optionen ähnlich häufig gewählt (56% beziehungsweise 53%) und beide häufiger als die zweijährige Option (45%).
+
+::: plot-box
+<div class="plot-title">Welche Förderinstrumente bevorzugten die Forschenden im faktoriellen Survey?</div>
+```{r plot-desktop-2}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_2()
+
+```
+::: caption
+Die Kacheln stehen für die neun vorgestellten hypothetischen Förderinstrumente. Die Prozentwerte zeigen, wie häufig ein Förderinstrument gewählt wurde, wenn es Teil eines Vergleichspaars war. Sie geben nicht den Anteil der Teilnehmenden an, die sich unter allen neun Förderinstrumenten für eine bestimmte Option entschieden haben.
+:::
+:::
+
+Zweitens wurde unter den verschiedenen Optionen für den Standort des Forschungsprojekts das gemischte Modell klar bevorzugt. Bei einer Beitragsdauer von drei Jahren wurde diese Option in 67% der Vergleiche gewählt, in denen sie enthalten war. Bei vier Jahren stieg dieser Anteil auf 78% und erreichte damit den höchsten Wert aller neun hypothetischen Förderinstrumente.
+
+Die Präferenzmuster waren über die Forschungsbereiche hinweg ähnlich. Auch Geschlecht und die Frage, ob jemand Kinder hat, spielten keine bedeutende Rolle. Die Forschenden bevorzugten nicht einfach nur eine längere Förderdauer. Besonders wichtig war ihnen vielmehr eine ausreichende Dauer in Kombination mit einer arbeitgebenden Institution in der Schweiz und Flexibilität für internationale Forschungsaufenthalte.
+
+### Mehr Zeit ermöglicht bessere Forschung
+
+Im Anschluss an den faktoriellen Survey konnten die Teilnehmenden in einer offenen Frage ihre Vorstellungen zu einem künftigen Postdoc-Förderinstrument äussern. Insgesamt gingen 188 substanzielle Kommentare ein, die wir sorgfältig analysierten, um wiederkehrende Themen und Argumente zu identifizieren.^[Für die Analyse der Kommentare verwendeten wir einen überwiegend induktiven Ansatz: Anstatt von einem vorab festgelegten Kodierschema auszugehen, entwickelten und verfeinerten wir die Codes im Rahmen einer iterativen Auswertung der Kommentare. Einem Kommentar konnten mehrere Codes zugeordnet werden. Die Häufigkeiten geben an, in wie vielen Kommentaren ein Thema mindestens einmal vorkam.] Aus den Kommentaren wurde deutlich, dass Forschende längere Beitragsdauern nicht nur mit einer umfangreicheren finanziellen Unterstützung verbinden. Aufgrund der grösseren Planungssicherheit betrachten sie diese vielmehr als wichtige Voraussetzung für originelle und ambitionierte Forschung. Kürzere Beitragsdauern hingegen zwingen Forschende dazu, sich auf schnell erreichbare Ergebnisse und die Einreichung weiterer Fördergesuche zu konzentrieren, was für die weitere Karriere nicht unbedingt optimal ist. Eine Person schrieb beispielsweise: «Ich hatte keine Zeit [...], meine eigentlichen Ideen vollständig umzusetzen, sondern ging lieber ‹auf Nummer sicher›. Das war wahrscheinlich ein Karrierekiller…»
+
+::: plot-box
+<div class="plot-title">Was die Kommentare der Forschenden über den faktoriellen Survey hinaus zeigen</div>
+```{r plot-desktop-3}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_3()
+
+```
+::: caption
+Überblick über die 188 substantiellen offenen Kommentare. Die Prozentwerte geben den Anteil der Kommentare an, in denen das jeweilige Thema mindestens einmal codiert wurde. Da ein Kommentar mehrere Themen enthalten konnte, ergeben die Prozentwerte zusammen nicht 100%. Die offenen Kommentare liefern zusätzliche kontextbezogene Erkenntnisse, erlauben jedoch keine repräsentativen Aussagen über alle Forschenden (in frühen Karrierephasen). 
+:::
+:::
+
+### Internationale Erfahrung bleibt wertvoll, ist aber nicht für alle gleich gut realisierbar
+
+Internationale Erfahrung ist für die befragten Forschenden weiterhin wichtig für ihre berufliche Entwicklung. Sie verbinden damit Netzwerke, Kompetenzen und Einblicke in neue Forschungsumgebungen. Gleichzeitig beschreiben sie, wie soziale Bindungen, Kinder, Betreuungspflichten, Umzugskosten und die Erwerbstätigkeit von Partner:innen längere Auslandsaufenthalte erschweren können. Entscheidend ist daher nicht, ob internationale Erfahrung wertvoll ist, sondern ob ein fix vorgegebener Auslandsaufenthalt für alle Forschenden realisierbar ist. 
+
+Die Forschenden betonten zudem, wie wichtig es ist, Forschungsaufenthalte im Ausland mit einer Finanzierung vor und nach dem Aufenthalt zu verknüpfen, da es schwierig sein kann, Kontakte aufrechtzuerhalten oder nach einer längeren Abwesenheit wieder Anschluss an das Schweizer Forschungssystem zu finden. So lautet ein Kommentar: «Förderinstrumente für Auslandsaufenthalte sind nur eine Seite der Medaille. Sie müssen insbesondere bei längeren Aufenthalten sinnvoll mit Rückkehrbeiträgen verknüpft werden. Nach einer gewissen Zeit verlieren die Forschenden ihr Netzwerk in der Schweiz.» Dies erklärt die Attraktivität des gemischten Modells: Es verbindet internationale Erfahrung mit institutioneller Kontinuität und beruflichen Kontakten in der Schweiz. 
+
+Obwohl der Anstellungsstatus im faktoriellen Survey bei allen Optionen gleich war, wurde dieser Aspekt in den offenen Kommentaren angesprochen. Die Forschenden betonten den Unterschied zwischen Stipendien und regulären Anstellungen und verwiesen dabei auf Herausforderungen bei Sozialabgaben, Altersvorsorge, Arbeitslosenversicherung, Besteuerung und administrativem Aufwand. Gute Anstellungsbedingungen machen Forschungsaufenthalte im Ausland für einen grösseren Kreis von Forschenden zugänglich.
+
+### Erkenntnisse in die Ausgestaltung der Förderung einbeziehen
+
+Insgesamt sprechen diese Ergebnisse nicht gegen internationale Erfahrung. Vielmehr zeigen sie, dass Forschungsaufenthalte im Ausland am besten realisierbar sind, wenn Forschende über ausreichend Zeit und Flexibilität bei der Gestaltung ihrer Auslandsaufenthalte verfügen und zugleich Kontinuität bei ihrer Anstellung sowie bei ihren Verbindungen zum Schweizer Forschungssystem gewährleistet ist. Gleichzeitig unterscheiden sich Forschungsprojekte und Karrierewege. Deshalb braucht es Flexibilität statt eines einzigen vorgegebenen Wegs, um den unterschiedlichen Bedürfnissen der Forschenden gerecht zu werden. 
+
+Der faktorielle Survey und die ergänzenden offenen Kommentare flossen als eine von mehreren Quellen in die Reform der Karriereinstrumente auf Postdoc-Stufe ein. Berücksichtigt wurden auch frühere Erkenntnisse der CTC-Umfragen, Konsultationen mit Schweizer Hochschulen und Forschenden in frühen Karrierephasen sowie förderpolitische Analysen. Der daraus hervorgegangene Postdoc-Beitrag verbindet eine Anstellung in der Schweiz mit Möglichkeiten für Forschungsaufenthalte im Ausland. Er baut auf den sich ergänzenden Stärken von Postdoc.Mobility und Ambizione auf und bietet den Forschenden zugleich mehr Eigenständigkeit, Flexibilität und Sicherheit, um ambitionierte Forschungsvorhaben zu verfolgen.
+
+::: plot-box
+<div class="plot-title">Die aktuelle Reform der Karriereförderung des SNF auf einen Blick</div>
+```{r plot-desktop-4}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_4()
+
+```
+:::
+
+Mit besseren Rahmenbedingungen unterstützt das neue Förderinstrument die berufliche Entwicklung von Forschenden, bereitet sie auf vielfältige Karrierewege vor und ermöglicht ihnen, zu einem starken und vielfältigen Schweizer Forschungssystem beizutragen.
+
+Daten, Text und Code dieser Datengeschichte sind [auf GitHub verfügbar](`r params$github_url`) und [auf Zenodo archiviert](`r params$doi_url`). <br>DOI: `r sub("https://doi.org/", "", params$doi_url)`
+
+```{r prevent-internal-snsf-packages}
+#| include: false
+# Check if any internal SNSF packages is used in the data story
+is_snf_pkg <- grepl(
+  "^snf\\.?(?!.*(datastory)).+$",
+  loadedNamespaces(),
+  perl = TRUE
+)
+
+if (any(is_snf_pkg)) {
+  stop(
+    "You must not use internal SNSF packages in data stories. ",
+    "Here are the packages you should not use:\n",
+    sapply(
+      loadedNamespaces()[is_snf_pkg],
+      \(x) sprintf("\n- `%s`", x),
+      USE.NAMES = FALSE
+    )
+  )
+}
+```

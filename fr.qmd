@@ -1,0 +1,249 @@
+---
+title: "`r params$title`"
+format:
+  html:
+    toc: false
+    css: ["style.css"]
+    mainfont: Theinhardt
+    fontsize: "16px"
+    embed-resources: true
+    page-layout: custom
+    link-external-newwindow: true
+    footnotes-hover: true
+    fig-align: center
+    fig-format: retina
+    fig-dpi: 300
+language:
+  section-title-footnotes: "Notes de bas de page"
+params:
+  title: "Du constat à l’action : le FNS conçoit un nouvel instrument de financement postdoctoral"
+  lead: "Les résultats de l’étude Career Tracker Cohorts ont contribué à l’élaboration du nouveau Subside Postdoc du FNS, qui offre aux chercheurs·euses en début de carrière de meilleures conditions-cadres et davantage de flexibilité."
+  publication_date: "2026-11-26 04:00:00"
+  lang: fr
+  doi_url: "https://doi.org/10.46446/datastory.ctc-new-postdoc-funding"
+  github_url: "https://github.com/snsf-data/datastory_ctc_new_postdoc_funding"
+execute:
+  echo: false
+  warning: false
+  message: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r general-setup}
+#| include: false
+
+chk_ds_pkg_is_installed <- function() {
+  if (!require("snf.datastory", quietly = TRUE)) {
+    stop(
+      "The `snf.datastory` package is not available. Run ",
+      "`devtools::install_github(\"snsf-data/snf.datastory\")` to install the ",
+      "latest version."
+    )
+  }
+  ds_ver <- packageDescription("snf.datastory")[["Version"]]
+  if (package_version(ds_ver) < package_version("0.1.5")) {
+    stop(
+      "`snf.datastory` >= 0.1.5 is required and your version is ",
+      ds_ver,
+      ". Run `devtools::install_github(\"snsf-data/snf.datastory\")` to ",
+      "install the latest version."
+    )
+  }
+}
+
+chk_ds_pkg_is_installed()
+
+# Load packages
+library(here)
+library(readr)
+library(ggchicklet)
+library(ggplot2)
+library(ggtext)
+library(grid)
+library(knitr)
+library(snf.datastory)
+library(dplyr)
+library(purrr)
+
+source("R/read_and_prepare_data.R")
+source("R/make_figures.R")
+source("R/translations.R")
+
+# Set the locale for date formatting (Windows)
+Sys.setlocale(
+  "LC_TIME",
+  switch(
+    params$lang,
+    en = "English",
+    de = "German",
+    fr = "French"
+  )
+)
+
+# Knitr hook for local formatting of printed numbers
+knitr::knit_hooks$set(
+  inline = function(x) {
+    if (!is.numeric(x)) {
+      x
+    } else {
+      snf.datastory::print_num(x, params$lang)
+    }
+  }
+)
+
+```
+
+```{r print-header-infos}
+#| results: asis
+
+# Add publication date to header
+cat(format(as.Date(params$publication_date), "%d.%m.%Y"))
+```
+
+**`r params$lead`**
+
+Les échanges et les réseaux internationaux constituent depuis longtemps un pilier de la recherche universitaire. Ils s’appuient sur différents mécanismes qui favorisent les échanges entre institutions, pays et disciplines. Si ces mécanismes progressent au gré des moyens de communication, les objectifs professionnels et la situation personnelle des chercheuses et chercheurs évoluent eux aussi tout au long de leur carrière.
+
+Associés à des perspectives de carrière incertaines, ces aspects déterminent les possibilités qui s’offrent aux chercheuses et chercheurs en matière de collaboration internationale, notamment en ce qui concerne les séjours de recherche à l’étranger. Le financement postdoctoral doit donc offrir des possibilités d’expérience au plan international qui contribuent à pérenniser l’excellence de la recherche. Il a donc vocation à favoriser une plus grande indépendance scientifique tout en tenant compte de la diversité des parcours professionnels et des situations personnelles.
+
+Le FNS procède actuellement à une refonte de ses instruments d’encouragement de carrière. L’objectif est de mieux les adapter aux différentes étapes de carrière dans la recherche, de refléter un éventail de parcours professionnels plus large et d’offrir un environnement plus propice à la conduite de la recherche. [L’un des piliers de cette réforme est un nouveau dispositif d’encouragement de carrière – baptisé Subside Postdoc – qui sera lancé en 2028](https://www.snf.ch/fr/iZvbYDyIyY1mGyA0/news/du-nouveau-sur-la-reforme-des-carrieres). Il succédera aux instruments « Postdoc.Mobility » et « Ambizione ».
+
+Cette réforme reflète l’engagement global du FNS à poursuivre une politique éclairée par des données probantes. En complément des évaluations, consultations et données administratives, l’étude « Career Tracker Cohorts » (CTCs) du FNS a fourni une base factuelle essentielle à cette réforme. En suivant des chercheuses et chercheurs après le dépôt d’une demande d’encouragement de carrière auprès du FNS, les CTCs permettent de retracer leur évolution professionnelle et de mettre en évidence des tendances que les données relatives aux requêtes seules ne permettent pas d’appréhender. Ces observations ont révélé que le système actuel comportait des faiblesses et ainsi orienté la mise en place du nouveau Subside Postdoc. Par ailleurs, l’étude a permis au FNS de prendre en considération les expériences comme les préférences des chercheuses et chercheurs lors de son élaboration.
+
+::: info-box
+
+### L’étude « Career Tracker Cohorts »
+
+L’étude [« Career Tracker Cohorts (CTCs) »](https://careertrackercohorts.ch/) est une étude longitudinale lancée par le FNS afin de suivre les candidat·es à un encouragement de carrière et d’analyser l’évolution de leur parcours professionnel. Cette étude suit l’évolution de leur situation, de leurs activités de recherche, de leurs aspirations et de leurs expériences professionnelles grâce à des enquêtes répétées menées sur une période d’au moins dix ans. Ces données permettent de mettre en évidence la contribution que l’encouragement de carrière apporte au développement professionnel des chercheuses et chercheurs.
+
+Elle porte sur environ 3700 participant·es ayant déposé une candidature aux instruments Early Postdoc.Mobility, Postdoc.Mobility, Ambizione, PRIMA et Eccellenza entre l’automne 2018 et le printemps 2021, et à la fois sur les requérant·es retenus et celles et ceux qui ne l’ont pas été. Les CTCs sont réalisées pour le compte du FNS par le Centre interfacultaire de recherche en éducation de l’Université de Berne. Les données sont également mises à disposition pour des travaux de recherche allant au-delà des analyses effectuées par le FNS lui-même; leur accès peut être demandé via [SWISSUbase](https://www.swissubase.ch/fr/catalogue/studies/13610/21657/overview).
+
+:::
+
+### Tirer parti des points forts tout en remédiant aux points faibles
+
+Les instruments Postdoc.Mobility et Ambizione ont apporté un soutien précieux et complémentaire aux chercheuses et chercheurs en début de carrière en Suisse. Les bourses Postdoc.Mobility offraient l’opportunité d’acquérir une expérience de recherche à l’international avec ensuite la possibilité d’obtenir un financement pour un retour en Suisse, tandis que les subsides Ambizione avaient pour vocation de permettre à des chercheuses et chercheurs de diriger leurs propres projets de recherche au sein d’institutions suisses. Des résultats antérieurs des CTCs ont montré que les bénéficiaires de ces bourses consacraient plus de temps à leurs travaux que les chercheur·euses occupant d’autres postes de recherche, et que celles et ceux ayant mené à bien un projet encouragé [considéraient généralement que ce soutien leur avait été utile pour faire progresser leur carrière académique](https://careertrackercohorts.ch/wp-content/uploads/2025/07/2025-2-SNSF-CTC-Newsletter.pdf).
+
+Toutefois, les CTCs ont également mis en évidence de sérieuses lacunes, notamment en matière d’accompagnement, [de réinsertion dans le système de recherche suisse après un séjour à l’étranger,](https://data.snf.ch/stories/ctc-18-carrieres-postdoctorales-fr) et [d’absence d’emploi stable pour de nombreux bénéficiaires de l’instrument Postdoc.Mobility](https://careertrackercohorts.ch/wp-content/uploads/2024/03/2023-1-SNSF-CTC-Newsletter.pdf), notamment des interruptions de cotisations sociales. Certaines de ces conclusions ont donné lieu à des améliorations rapides et ciblées : les exigences posées concernant le mentorat ont ainsi été renforcées et la bourse de retour en Suisse a été augmentée. Il subsistait toutefois des questions structurelles d’ordre plus général, concernant par exemple la manière dont l’encouragement postdoctoral devrait concilier autonomie, expérience internationale et conditions de travail stables.
+
+### Qu’attendent les chercheuses et chercheurs d’un financement postdoctoral ?
+
+Dans le cadre de la réforme en cours, le FNS a souhaité savoir quelles caractéristiques d’un instrument d’encouragement postdoctoral seraient les plus appréciées par les chercheuses et chercheurs ayant déjà franchi cette étape de leur carrière. À cette fin, le FNS a intégré une enquête factorielle spécialement conçue dans l’enquête CTC de 2025. Il a ainsi été demandé aux participant·es d’évaluer plusieurs scénarios hypothétiques de financement postdoctoral, lesquels variaient quant à la durée et au lieu.
+
+::: info-box
+
+### Les préférences des chercheuses et chercheurs ont été étudiées au moyen d’une enquête factorielle
+
+Une enquête factorielle propose aux personnes interrogées des options hypothétiques qui ne diffèrent que par certaines caractéristiques. En combinant systématiquement ces caractéristiques et en demandant aux participant·es de choisir entre différentes options, l’analyse permet de déterminer quelles combinaisons de caractéristiques sont privilégiées.
+
+Les instruments postdoctoraux hypothétiques variaient en ce qui concerne la durée (24, 36 ou 48 mois) et le lieu (entièrement en Suisse, entièrement à l’étranger ou selon un dispositif mixte basé en Suisse et incluant un séjour à l’étranger facultatif). La combinaison de ces caractéristiques a permis d’obtenir neuf instruments d’encouragement envisageables. Tous les autres aspects, notamment le groupe cible, les frais pris en charge et le statut professionnel, sont par ailleurs restés inchangés. Chaque participant·e a évalué trois paires choisies au hasard et sélectionné pour chacune l’instrument auquel il aurait préféré postuler.
+
+::: plot-box
+<div class="plot-title">Un exemple illustrant l’une des paires présentées aux participants</div>
+```{r plot-desktop-1}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_1()
+
+```
+::: caption
+L’enquête a été menée exclusivement en anglais et la capture d’écran est donc présentée dans cette langue.
+:::
+:::
+
+L’analyse finale porte sur 1077 choix effectués par 368 personnes. Les trois quarts avaient déjà bénéficié, ou bénéficient actuellement, d’une bourse d’encouragement de carrière, la plupart étant des bourses (Early) Postdoc.Mobility. L’échantillon comprend des scientifiques issus des trois domaines de recherche et présente, dans l’ensemble, une répartition équilibrée entre les sexes : 37,7 % ont une formation ou travaillent actuellement dans les SV, 33,6 % dans les disciplines MINT et 27,9 % dans les SHS; 44,9 % sont des femmes.
+
+:::
+
+### Les chercheuses et chercheurs privilégient clairement des subsides plus longs et offrant davantage de flexibilité
+
+À la lecture des résultats de l’enquête factorielle, deux tendances se dégagent. Tout d’abord, les chercheuses et chercheurs ont systématiquement privilégié les options prévoyant des durées d’encouragement plus longues. Pour les instruments basés en Suisse, ou combinant des séjours en Suisse et à l’étranger, la probabilité pour une option d’être retenue augmente considérablement en fonction de la durée du subside, passant respectivement de 22 % à 50 %, et de 40 % à 78 %. Pour les instruments se déroulant entièrement à l’étranger, les durées de trois et quatre ans ont été choisies à des taux similaires (respectivement 56 % et 53 %) et toutes deux plus souvent que l’option de deux ans (45 %).
+
+::: plot-box
+<div class="plot-title">Quels dispositifs de financement les chercheur·euses ont-ils privilégiés dans l’enquête factorielle ?</div>
+```{r plot-desktop-2}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_2()
+
+```
+::: caption
+Les vignettes représentent les neuf instruments d’encouragement hypothétiques présentés. Ces pourcentages indiquent la fréquence à laquelle un instrument d’encouragement a été choisi lorsqu’il figurait dans une paire. Ils ne reflètent pas la proportion de participant·es ayant choisi une option parmi les neuf présentées.
+:::
+:::
+
+Ensuite, parmi les différentes options envisagées pour la localisation du projet de recherche, la formule mixte s’est clairement imposée. Associée à un financement sur trois ans, cette option a été choisie dans 67 % des cas incluant ce scénario; sur quatre ans, ce pourcentage est passé à 78 %, soit le résultat le plus élevé parmi les neuf instruments d’encouragement hypothétiques.
+
+Les tendances générales en matière de préférences étaient globalement les mêmes, quels que soient le domaine de recherche, le sexe et le statut parental. Les chercheuses et chercheurs ne privilégient pas simplement les plus longues durées : ils apprécient qu’une durée suffisante soit couplée à une institution employeuse suisse tout en offrant une souplesse suffisante pour permettre des séjours à l’étranger.
+
+### Plus de temps pour des recherches plus approfondies
+
+L’enquête factorielle a été suivie d’une question ouverte invitant les participant·es à donner leur avis sur un futur instrument d’encouragement postdoctoral. Au total, ce sont 188 commentaires de fond qui ont été formulés. Nous les avons soigneusement analysés afin d’identifier les thèmes et arguments récurrents.^[Nous avons adopté une approche essentiellement inductive pour analyser les commentaires : plutôt que de partir d’un modèle de codage prédéfini, nous avons élaboré et affiné les codes grâce à une analyse itérative des commentaires. Les commentaires sont susceptibles de se voir attribuer plusieurs codes. Leur fréquence indique le nombre de commentaires dans lesquels un thème est apparu au moins une fois.] Il en ressort clairement que les chercheuses et chercheurs associent les périodes plus longues à un soutien financier accru, mais considèrent aussi que leur durée constitue une condition indispensable à la conduite de recherches originales et ambitieuses du fait de la meilleure planification qu’elles permettent. En revanche, les durées plus courtes les obligent à se concentrer sur des résultats pouvant être obtenus rapidement et sur de nouvelles demandes de financement, ce qui n’est pas forcément idéal pour la suite de leur carrière. À titre d’exemple, une personne a écrit : « Je n’avais pas eu le temps [...] de concrétiser pleinement mes idées et j’ai préféré jouer la carte de la prudence. Ça a sans doute nui à ma carrière… ».
+
+::: plot-box
+<div class="plot-title">Ce que les commentaires des chercheur·euses ont apporté à l’enquête factorielle</div>
+```{r plot-desktop-3}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_3()
+
+```
+::: caption
+Aperçu des 188 commentaires libres. Les pourcentages indiquent la proportion de commentaires dans lesquels le thème correspondant a été identifié au moins une fois. Un commentaire pouvant porter sur plusieurs thèmes, la somme des pourcentages n’est pas égale à 100 %. Les commentaires libres fournissent des éléments contextuels, mais ne sont pas nécessairement représentatifs de l’ensemble de la population de chercheuses et chercheurs (en début de carrière).
+:::
+:::
+
+### L’expérience internationale est précieuse, mais n’est pas envisageable pour tout le monde
+
+L’expérience internationale reste un atout professionnel reconnu. Les participant·es y associent réseautage, compétences et ouverture sur de nouveaux environnements de recherche. Cependant, ils expliquent également comment les liens sociaux, les enfants, les obligations familiales, les frais de déménagement et la situation professionnelle du conjoint peuvent compliquer une mobilité internationale de longue durée. La question centrale n’est donc pas de savoir si l’expérience internationale est utile, mais si un séjour à l’étranger prédéfini est envisageable pour tous les chercheur·euses.
+
+Ils ont également souligné combien il est important que les séjours de recherche à l’étranger soient associés à un financement disponible avant et après car il peut s’avérer difficile de maintenir des liens et de réintégrer le système de recherche suisse après une longue absence. « Les instruments d’encouragement des séjours à l’étranger ne constituent qu’un aspect de la question. Ils doivent logiquement être liés à des bourses de retour, surtout si les séjours sont plus longs. Au bout d’un certain temps, les gens perdent leur réseau suisse », a résumé une personne ayant participé à l’enquête. C’est ce qui explique l’attrait de l’instrument d’encouragement mixte : en effet, il allie une dimension internationale à une continuité institutionnelle et au maintien d’un réseau professionnel en Suisse.
+
+Bien que le statut professionnel ait été maintenu constant dans l’enquête factorielle, cet aspect a été évoqué dans les commentaires libres. La différence entre les bourses et les emplois classiques a été soulignée, notamment en ce qui concerne les cotisations sociales, les retraites, l’assurance chômage, la fiscalité et les charges administratives. Les conditions d’emploi avantageuses permettent à un plus grand nombre de chercheurs et chercheuses d’effectuer des séjours de recherche à l’étranger.
+
+### Traduire les résultats en instruments d’encouragement
+
+Dans l’ensemble, ces résultats ne découragent pas les expériences internationales. Ils montrent au contraire que les séjours de recherche à l’étranger sont plus facilement réalisables lorsque les chercheuses et chercheurs disposent de suffisamment de temps, d’une certaine souplesse organisationnelle et d’une continuité dans leur emploi et les liens qu’ils entretiennent avec le système de recherche suisse. Par ailleurs, les projets de recherche et les parcours professionnels varient d’un cas à l’autre, ce qui nécessite une certaine flexibilité plutôt qu’un modèle unique et prédéfini pour répondre aux divers besoins exprimés.
+
+L’enquête factorielle et les commentaires qui l’accompagnaient figurent parmi les sources ayant servi de base au FNS pour restructurer ses instruments d’encouragement de carrière au niveau postdoctoral, lesquelles incluent également les résultats antérieurs des CTCs, les consultations menées avec des hautes écoles suisses et des chercheur·euses en début de carrière ainsi qu’une analyse des politiques publiques. Le Subside Postdoc qui a ainsi vu le jour combine un poste en Suisse à la possibilité d’effectuer des séjours de recherche à l’étranger. Cet instrument s’appuie sur les atouts complémentaires qu’apportaient les instruments Postdoc.Mobility et Ambizione, tout en offrant aux chercheuses et chercheurs davantage d’autonomie, de flexibilité et de sécurité pour mener à bien des travaux ambitieux.
+
+::: plot-box
+<div class="plot-title">La réforme de l’encouragement de carrières du FNS en bref</div>
+```{r plot-desktop-4}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_4()
+
+```
+:::
+
+En offrant de meilleures conditions-cadres, ce nouvel instrument d’encouragement soutient l’évolution des chercheuses et chercheurs, les prépare à des parcours professionnels variés et leur permet de contribuer à un système de recherche suisse solide et diversifié.
+
+Les données, le texte et le code de ce récit de données sont [disponibles sur GitHub](`r params$github_url`) et [archivés sur Zenodo](`r params$doi_url`). <br>DOI: `r sub("https://doi.org/", "", params$doi_url)`
+
+```{r prevent-internal-snsf-packages}
+#| include: false
+# Check if any internal SNSF packages is used in the data story
+is_snf_pkg <- grepl(
+  "^snf\\.?(?!.*(datastory)).+$",
+  loadedNamespaces(),
+  perl = TRUE
+)
+
+if (any(is_snf_pkg)) {
+  stop(
+    "You must not use internal SNSF packages in data stories. ",
+    "Here are the packages you should not use:\n",
+    sapply(
+      loadedNamespaces()[is_snf_pkg],
+      \(x) sprintf("\n- `%s`", x),
+      USE.NAMES = FALSE
+    )
+  )
+}
+```

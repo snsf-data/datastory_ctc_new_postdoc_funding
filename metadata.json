@@ -1,0 +1,26 @@
+[
+  {
+    "title_en": "From evidence to reform: shaping the SNSF’s new postdoctoral scheme",
+    "title_de": "Von Evidenz zur Reform: das neue Postdoc-Förderinstrument des SNF",
+    "title_fr": "Du constat à l’action : le FNS conçoit un nouvel instrument de financement postdoctoral",
+    "author_en": "Julia Jerke, Data Team, SNSF;Alexandra Bagaïni, Data Team, SNSF;Christina Manner, Careers, SNSF",
+    "author_de": "Julia Jerke, Data Team, SNSF;Alexandra Bagaïni, Data Team, SNSF;Christina Manner, Careers, SNSF",
+    "author_fr": "Julia Jerke, Data Team, SNSF;Alexandra Bagaïni, Data Team, SNSF;Christina Manner, Careers, SNSF",
+    "datastory_category": "standard",
+    "publication_date_en": "2026-11-26 04:00:00",
+    "publication_date_de": "2026-11-26 04:00:00",
+    "publication_date_fr": "2026-11-26 04:00:00",
+    "languages": "en;de;fr",
+    "short_desc_en": "Findings from the Career Tracker Cohorts study helped shape the SNSF’s new Postdoc Grant, which offers early-career researchers better framework conditions and more flexibility.",
+    "short_desc_de": "Erkenntnisse aus der Studie «Career Tracker Cohorts» haben die Ausgestaltung des neuen Förderinstruments Postdoc-Beitrag mitgeprägt. Es bietet Forschenden in frühen Karrierephasen bessere Rahmenbedingungen und mehr Flexibilität.",
+    "short_desc_fr": "Les résultats de l’étude Career Tracker Cohorts ont contribué à l’élaboration du nouveau Subside Postdoc du FNS, qui offre aux chercheurs·euses en début de carrière de meilleures conditions-cadres et davantage de flexibilité.",
+    "tags": "T70T,T290T,T300T",
+    "top_story": "false",
+    "github_url": "https://github.com/snsf-data/datastory_ctc_new_postdoc_funding",
+    "doi": "https://doi.org/10.46446/datastory.ctc-new-postdoc-funding",
+    "name_en": "ctc-new-postdoc-funding",
+    "name_de": "ctc-neuer-postdoc-beitrag",
+    "name_fr": "ctc-nouveau-subside-postdoc",
+    "zenodo_record_id": "24535365"
+  }
+]

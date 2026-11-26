@@ -1,0 +1,12 @@
+Figure,en,de,fr
+2,years,Jahre,ans
+2,2 years,2 Jahre,2 ans
+2,3 years,3 Jahre,3 ans
+2,4 years,4 Jahre,4 ans
+2,Switzerland only,Nur Schweiz,Suisse uniquement
+2,Abroad only,Nur Ausland,À l’étranger uniquement
+2,Mixed,Gemischt,Mixte
+2,(Swiss base + optional abroad),(Basis Schweiz + Ausland optional),(Base en Suisse + à l’étranger facultatif)
+2,<b>Switzerland only</b>,<b>Nur Schweiz</b>,<b>Suisse uniquement</b>
+2,<b>Abroad only</b>,<b>Nur Ausland</b>,<b>À l’étranger uniquement</b>
+2,<b>Mixed</b><br><span style='font-weight:400;font-size:9pt;'>(Swiss base + optional abroad)</span>,<b>Gemischt </b><br><span style='font-weight:400;font-size:9pt;'>(Basis Schweiz + Ausland optional)</span>,<b>Mixte</b><br><span style='font-weight:400;font-size:9pt;'>(Base en Suisse + à l’étranger facultatif)</span>

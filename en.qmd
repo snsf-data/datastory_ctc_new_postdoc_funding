@@ -1,0 +1,246 @@
+---
+title: "`r params$title`"
+format:
+  html:
+    toc: false
+    css: ["style.css"]
+    mainfont: Theinhardt
+    fontsize: "16px"
+    embed-resources: true
+    page-layout: custom
+    link-external-newwindow: true
+    footnotes-hover: true
+    fig-align: center
+    fig-format: retina
+    fig-dpi: 300
+language:
+  section-title-footnotes: "Footnotes"
+params:
+  title: "From evidence to reform: shaping the SNSF’s new postdoctoral scheme"
+  lead: "Findings from the Career Tracker Cohorts study helped shape the SNSF’s new Postdoc Grant, which offers early-career researchers better framework conditions and more flexibility."
+  publication_date: "2026-11-26 04:00:00"
+  lang: en
+  doi_url: "https://doi.org/10.46446/datastory.ctc-new-postdoc-funding"
+  github_url: "https://github.com/snsf-data/datastory_ctc_new_postdoc_funding"
+execute:
+  echo: false
+  warning: false
+  message: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r general-setup}
+#| include: false
+
+chk_ds_pkg_is_installed <- function() {
+  if (!require("snf.datastory", quietly = TRUE)) {
+    stop(
+      "The `snf.datastory` package is not available. Run ",
+      "`devtools::install_github(\"snsf-data/snf.datastory\")` to install the ",
+      "latest version."
+    )
+  }
+  ds_ver <- packageDescription("snf.datastory")[["Version"]]
+  if (package_version(ds_ver) < package_version("0.1.5")) {
+    stop(
+      "`snf.datastory` >= 0.1.5 is required and your version is ",
+      ds_ver,
+      ". Run `devtools::install_github(\"snsf-data/snf.datastory\")` to ",
+      "install the latest version."
+    )
+  }
+}
+
+chk_ds_pkg_is_installed()
+
+# Load packages
+library(here)
+library(readr)
+library(ggchicklet)
+library(ggplot2)
+library(ggtext)
+library(grid)
+library(knitr)
+library(snf.datastory)
+library(dplyr)
+library(purrr)
+
+source("R/read_and_prepare_data.R")
+source("R/make_figures.R")
+source("R/translations.R")
+
+# Set the locale for date formatting (Windows)
+Sys.setlocale(
+  "LC_TIME",
+  switch(
+    params$lang,
+    en = "English",
+    de = "German",
+    fr = "French"
+  )
+)
+
+# Knitr hook for local formatting of printed numbers
+knitr::knit_hooks$set(
+  inline = function(x) {
+    if (!is.numeric(x)) {
+      x
+    } else {
+      snf.datastory::print_num(x, params$lang)
+    }
+  }
+)
+
+```
+
+```{r print-header-infos}
+#| results: asis
+
+# Add publication date to header
+cat(format(as.Date(params$publication_date), "%d.%m.%Y"))
+```
+
+**`r params$lead`**
+
+International exchanges and networks have been a long-standing pillar of academic research. They are supported by different mechanisms that foster exchanges between institutions, countries and sectors. While these mechanisms evolve with new means of communications, researchers’ professional goals and personal circumstances also change throughout their careers.
+
+These aspects, together with uncertain career prospects, shape the options researchers have for international collaboration, including research stays abroad. Postdoctoral funding must therefore offer international experience that sustains research excellence. At the same time, it must support researchers’ development towards increased scientific independence as well as diverse career paths and personal situations.
+
+The SNSF is reforming its career funding portfolio to align its funding schemes more closely with researchers’ career stages, to reflect a wider range of career paths and to provide favourable conditions for conducting research. [A cornerstone of the reform is the launch of a new career funding scheme – the Postdoc Grant – in 2028](https://www.snf.ch/en/iZvbYDyIyY1mGyA0/news/latest-news-on-career-funding-reform). It will succeed both Postdoc.Mobility and Ambizione.
+
+This reform reflects the SNSF’s broader commitment to evidence-informed policy. Alongside evaluations, consultations and administrative data, the SNSF’s Career Tracker Cohorts study (CTCs) has provided a critical evidence base for the reform. By following researchers after they apply for SNSF career funding, the CTCs show how their careers develop and reveal patterns that application data alone cannot capture. These insights revealed some of the weaknesses of the current system and so shaped the development of the new Postdoc Grant. In addition, the study allowed the SNSF to take researchers’ experiences and preferences into account when developing this new funding model.
+
+::: info-box
+
+### The Career Tracker Cohort study
+
+The [Career Tracker Cohorts study](https://careertrackercohorts.ch/) is a longitudinal study initiated by the SNSF to follow applicants to SNSF career funding and examine how their careers develop. The study tracks changes in employment, research activities, career aspirations, and professional experiences through repeated surveys over at least ten years. This provides evidence on the contribution of career funding to researchers’ professional development. 
+
+The study comprises approximately 3,700 participants who applied to Early Postdoc.Mobility, Postdoc.Mobility, Ambizione, PRIMA and Eccellenza between autumn 2018 and spring 2021, following both funded and unfunded applicants. The CTCs are conducted on behalf of the SNSF by the Interfaculty Centre for Educational Research at the University of Bern. The data are also available for research beyond the SNSF’s own analyses, and access can be requested through [SWISSUbase](https://www.swissubase.ch/en/catalogue/studies/13610/21657/overview).
+
+:::
+
+### Building on strengths while addressing weaknesses
+
+Postdoc.Mobility and Ambizione have provided valuable and complementary support to early-career researchers in Switzerland. Postdoc.Mobility has offered international research experience followed by the possibility of funding a return to Switzerland, while Ambizione has enabled researchers to lead their own research projects at Swiss institutions. Earlier CTC findings show that career grantees devoted more of their working time to research than researchers in other research positions, and those who completed a grant [generally considered it helpful for advancing their academic careers](https://careertrackercohorts.ch/wp-content/uploads/2025/07/2025-2-SNSF-CTC-Newsletter.pdf).
+
+However, the CTCs also revealed serious weaknesses, including insufficient mentoring, [difficulties reconnecting with the Swiss research system after a stay abroad,](https://data.snf.ch/stories/ctc-18-postdoctoral-careers-en) and the [lack of regular employment for many Postdoc.Mobility fellows](https://careertrackercohorts.ch/wp-content/uploads/2024/03/2023-1-SNSF-CTC-Newsletter.pdf), in particular gaps in social security contributions. Some of these findings led to rapid and targeted improvements, such as stronger mentoring requirements and increased funding for a return grant based in Switzerland. Yet broader structural questions remained, particularly relating to how postdoctoral funding should combine research autonomy, international experience and secure working conditions. 
+
+### What do researchers value in postdoctoral funding?
+
+As part of the current reform, the SNSF wanted to learn which characteristics would be valued the most in a postdoctoral funding scheme by researchers who had already experienced this phase of their career. To do so, the SNSF included a purpose-built factorial survey in the 2025 CTC monitoring survey. Participants were asked to assess multiple hypothetical postdoctoral funding schemes that varied in duration and location.
+
+::: info-box
+
+### How we studied researchers’ preferences with a factorial survey
+
+A factorial survey presents respondents with hypothetical options that differ only in selected characteristics. Systematically combining these characteristics and asking participants to choose between options enables analysis to examine which combinations of characteristics were preferred.
+
+In this study, the hypothetical postdoctoral schemes varied in duration (24, 36, or 48 months) and location (entirely in Switzerland, entirely abroad or a mixed arrangement based in Switzerland with an optional stay abroad). Combining these characteristics yielded nine possible schemes. All other aspects, including the target group, covered costs and employment status, remained unchanged. Each participant assessed three randomised pairs of schemes and selected the scheme they would prefer to apply for in each pair.
+
+::: plot-box
+<div class="plot-title">An example showing one of the pairs presented to participants</div>
+```{r plot-desktop-1}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_1()
+
+```
+:::
+
+The final analysis includes 1,077 choices submitted by 368 researchers. Three quarters of them previously held or currently hold a career grant, most of which were (Early) Postdoc.Mobility fellowships. The sample includes researchers from all three research domains and is overall gender-balanced: 37.7% have a background or currently work in LS, 33.6% in MINT, and 27.9% in SSH; 44.9% are women. 
+
+:::
+
+### Researchers clearly prefer longer grant duration and more flexibility
+
+Looking at the results of the factorial survey, two patterns emerge. First, researchers consistently favoured the options with longer funding periods. For schemes based in Switzerland or combining time in Switzerland and abroad, the probability of being preferred increases substantially with grant duration, from 22% to 50% and from 40% to 78%, respectively. For fully abroad schemes, the three- and four-year options were selected at similar rates (56% and 53%, respectively) and both more often than the two-year option (45%).
+
+::: plot-box
+<div class="plot-title">Which funding schemes did researchers prefer in the factorial survey?</div>
+```{r plot-desktop-2}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_2()
+
+```
+::: caption
+The tiles represent the nine different presented hypothetical funding schemes. The percentages show how often a scheme was chosen when it appeared in a pair. They do not represent the share of participants selecting one option from all nine schemes.
+:::
+:::
+
+Second, among the different options for the location of the research project, the mixed scheme was the clear winner. When combined with three years of funding, this option was selected in 67% of comparisons that included that scheme; at four years, this increased to 78%, the highest result among all nine hypothetical schemes.
+
+The overall preference patterns were broadly similar across research domains, gender and parental status. Researchers did not simply prefer a longer grant; instead, they particularly valued sufficient duration combined with a Swiss employing institution and flexibility for international research stays.
+
+### More time allows for better research
+
+The factorial survey was followed by an open question inviting participants to share their views on a future postdoctoral funding scheme. Overall, 188 substantive comments were submitted, which we carefully analysed to identify recurring topics and arguments.^[We used a primarily inductive approach to analyse the comments: Rather than starting with a predefined coding scheme, we developed and refined the codes through an iterative review of the comments. Comments could receive multiple codes; frequencies indicate the number of comments in which a theme appeared at least once.] From the comments it became clear that researchers associate longer funding periods not only with greater financial support, but as a condition for conducting original and ambitious research due to the greater planning security that longer periods allow. In contrast, shorter grant durations require researchers to focus on quickly achievable outputs and subsequent funding applications which are not necessarily optimal for a future career. For instance, one researcher wrote: “I had no time [...] to fully realise my actual ideas but rather played ‘safe’. This probably was a career killer…”
+
+::: plot-box
+<div class="plot-title">What researchers’ comments added to the factorial survey</div>
+```{r plot-desktop-3}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_3()
+
+```
+::: caption
+Overview of the 188 substantive open comments. Percentages show the share of comments in which the respective theme was coded at least once. A comment could cover more than one theme, so percentages do not sum to 100%. Open comments provide contextual evidence but may not be representative for all (early-career) researchers. 
+:::
+:::
+
+### International experience remains valuable, but is not equally feasible for everyone
+
+International experience remains a recognised career resource. Participants associate it with networks, skills and exposure to new research environments. However, they also describe how social connections, children, care obligations, relocation costs and the employment of partners can make extended international mobility difficult. The central issue is therefore not whether international experience is valuable, but whether a predefined stay abroad is feasible for all researchers. 
+
+Researchers also highlighted the importance of linking research stays abroad with funds before and after this stay as maintaining connections and returning to the Swiss research system can be difficult after a longer absence. “Funding schemes for stays abroad [are] only one side of the medal. They have to be logically linked to return funds, especially if the stays are longer. People lose their Swiss network after a while,” as one researcher summarised. This explains the appeal of the mixed scheme: It combines international exposure with institutional continuity and professional links in Switzerland. 
+
+Despite keeping employment status constant in the factorial survey, this aspect was raised in the open comments. The difference between fellowships and regular employments was stressed, referring to issues with social security contributions, pensions, unemployment insurance, taxation and administrative burden. Favourable employment conditions make research stays abroad accessible to a wider range of researchers.
+
+### Translating findings into funding design
+
+Overall, these findings do not discourage international experience. They instead show that research stays abroad are most feasible when researchers have sufficient time, flexibility in how stays abroad are organised as well as continuity in their employment and links to the Swiss research system. At the same time, research projects and career paths differ, requiring flexibility rather than a single prescribed route to support researchers’ various needs. 
+
+The factorial survey and accompanying open comments were among several sources informing the SNSF’s reform of its postdoc-level career funding schemes, alongside earlier CTC findings, consultations with Swiss higher education institutions and early-career researchers as well as funding policy analysis. The resulting Postdoc Grant combines a Swiss employment base with opportunities for research stays abroad. It builds on the complementary strengths of Postdoc.Mobility and Ambizione while giving researchers greater autonomy, flexibility and security to pursue ambitious work.
+
+::: plot-box
+<div class="plot-title">The current SNSF career funding reform in a nutshell</div>
+```{r plot-desktop-4}
+#| out-width: "100%"
+#| fig-height: 3
+
+make_figure_4()
+
+```
+:::
+
+By providing better framework conditions, the new funding scheme supports researchers’ professional development, prepares them for diverse career paths and enables them to contribute to a strong and diverse Swiss research system.
+
+Data, text and code of this data story are [available on GitHub](`r params$github_url`) and [archived on Zenodo](`r params$doi_url`).<br>DOI: `r sub("https://doi.org/", "", params$doi_url)`
+
+```{r prevent-internal-snsf-packages}
+#| include: false
+# Check if any internal SNSF packages is used in the data story
+is_snf_pkg <- grepl(
+  "^snf\\.?(?!.*(datastory)).+$",
+  loadedNamespaces(),
+  perl = TRUE
+)
+
+if (any(is_snf_pkg)) {
+  stop(
+    "You must not use internal SNSF packages in data stories. ",
+    "Here are the packages you should not use:\n",
+    sapply(
+      loadedNamespaces()[is_snf_pkg],
+      \(x) sprintf("\n- `%s`", x),
+      USE.NAMES = FALSE
+    )
+  )
+}
+```
